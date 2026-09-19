@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VATAGA Stripe Generator</title>
+  <style>
+    @font-face {
+      font-family: "VATAGA Rubik";
+      src: url("assets/fonts/Rubik-Black.ttf") format("truetype");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "VATAGA Rubik";
+      src: url("assets/fonts/Rubik-BlackItalic.ttf") format("truetype");
+      font-weight: 900;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "VATAGA Inter";
+      src: url("assets/fonts/InterVariable.ttf") format("truetype");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --ink: #f4f2ee;
+      --paper: #2b2529;
+      --panel: #211d20;
+      --line: #464045;
+      --muted: #9d989b;
+      --accent: #b6ff63;
+      --cyan: #ff00d4;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 82% 14%, rgba(182, 255, 99, .12), transparent 24%),
+        linear-gradient(135deg, #2e282d 0%, #1f1b1e 52%, #f3f2ee 52%, #f3f2ee 100%);
+      font-family: "VATAGA Inter", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #302a2f;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .01em;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    button:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--line);
+      background: #2b2529;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 850;
+      white-space: nowrap;
+      color: var(--accent);
+      font-family: "VATAGA Rubik", sans-serif;
+      font-style: italic;
+      text-transform: uppercase;
+    }
+
+    .mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background:
+        linear-gradient(135deg, transparent 0 22%, var(--accent) 22% 42%, transparent 42% 52%, var(--accent) 52% 72%, transparent 72%),
+        var(--paper);
+      border: 2px solid var(--accent);
+      transform: skew(-12deg);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary {
+      color: #fff;
+      background: #4b454a;
+      border-color: #6a6268;
+    }
+
+    .accent {
+      color: #111;
+      background: var(--accent);
+      border-color: #b8d838;
+    }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
+    }
+
+    .controls {
+      min-height: 0;
+      overflow: auto;
+      padding: 18px;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .drop {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border: 1px dashed #6a6268;
+      border-radius: 8px;
+      background:
+        repeating-linear-gradient(-18deg, transparent 0 9px, rgba(182, 255, 99, .12) 9px 11px),
+        #2b2529;
+      cursor: pointer;
+    }
+
+    .drop.drag {
+      border-color: var(--cyan);
+      background: #30262f;
+    }
+
+    .drop-title {
+      font-size: 16px;
+      font-weight: 850;
+      color: var(--accent);
+      font-family: "VATAGA Rubik", sans-serif;
+      font-style: italic;
+      text-transform: uppercase;
+    }
+
+    .drop-meta {
+      color: var(--muted);
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      color: #44413b;
+      color: var(--accent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #2b2529;
+    }
+
+    .tabs button {
+      min-height: 34px;
+      padding: 0 8px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      color: #171417;
+      box-shadow: 0 0 0 1px rgba(182, 255, 99, .2), 0 0 20px rgba(182, 255, 99, .18);
+    }
+
+    .control {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .control-head,
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .control label,
+    .toggle span {
+      font-weight: 700;
+    }
+
+    output {
+      min-width: 54px;
+      color: var(--muted);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--ink);
+      accent-color: var(--accent);
+    }
+
+    .toggle {
+      margin-top: 14px;
+    }
+
+    .toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--ink);
+      accent-color: var(--accent);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .color-field {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    input[type="color"] {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #312b30;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .stage {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      background:
+        linear-gradient(90deg, rgba(182, 255, 99, .12) 0 1px, transparent 1px 100%) 0 0 / 48px 48px,
+        #f4f3ef;
+    }
+
+    .info {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #2b2529;
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .preview {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 128px);
+      border: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .placeholder {
+      width: min(680px, 78vw);
+      aspect-ratio: 4 / 3;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      border: 1px dashed #6a6268;
+      border-radius: 8px;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 11px, rgba(182, 255, 99, .18) 11px 13px),
+        #2b2529;
+      color: var(--accent);
+      box-shadow: var(--shadow);
+      font-weight: 850;
+      text-align: center;
+      font-family: "VATAGA Rubik", sans-serif;
+      font-style: italic;
+      text-transform: uppercase;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        width: 100%;
+      }
+
+      .actions button {
+        flex: 1 1 150px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar,
+      .controls,
+      .info {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .tabs,
+      .button-row,
+      .color-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"></span>
+        <span>VATAGA stripe generator</span>
+      </div>
+      <div class="actions">
+        <button class="accent" id="resetButton" type="button">Сброс</button>
+        <button class="primary" id="exportSvgButton" type="button" disabled>Скачать SVG</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="controls">
+        <label class="drop" id="dropZone">
+          <input id="fileInput" type="file" accept="image/*" hidden>
+          <span class="drop-title">Загрузить фото</span>
+          <span class="drop-meta" id="fileMeta">PNG, JPG, JPEG, WebP</span>
+        </label>
+
+        <section class="section">
+          <h2>Режим</h2>
+          <div class="tabs" role="group" aria-label="Режим обработки">
+            <button class="active" type="button" data-mode="photo">Фото</button>
+            <button type="button" data-mode="silhouette">Силуэт</button>
+            <button type="button" data-mode="dark">Тени</button>
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="threshold">Порог</label>
+              <output id="thresholdValue">8</output>
+            </div>
+            <input id="threshold" type="range" min="1" max="100" value="8">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="readability">Читаемость</label>
+              <output id="readabilityValue">100</output>
+            </div>
+            <input id="readability" type="range" min="0" max="100" value="100">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="softness">Сглаживание</label>
+              <output id="softnessValue">6</output>
+            </div>
+            <input id="softness" type="range" min="0" max="6" value="6">
+          </div>
+
+          <label class="toggle">
+            <span>Авто-кадр</span>
+            <input id="autoCrop" type="checkbox">
+          </label>
+        </section>
+
+        <section class="section">
+          <h2>Полосы</h2>
+          <div class="control">
+            <div class="control-head">
+              <label for="stripeHeight">Толщина</label>
+              <output id="stripeHeightValue">11 px</output>
+            </div>
+            <input id="stripeHeight" type="range" min="1" max="24" value="11">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="stripeGap">Пробел</label>
+              <output id="stripeGapValue">6 px</output>
+            </div>
+            <input id="stripeGap" type="range" min="0" max="28" value="6">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="stripeAngle">Угол</label>
+              <output id="stripeAngleValue">-43°</output>
+            </div>
+            <input id="stripeAngle" type="range" min="-75" max="75" value="-43">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="cellSize">Деталь</label>
+              <output id="cellSizeValue">11 px</output>
+            </div>
+            <input id="cellSize" type="range" min="1" max="16" value="11">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="minRun">Минимум</label>
+              <output id="minRunValue">13 px</output>
+            </div>
+            <input id="minRun" type="range" min="0" max="80" value="13">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="noise">Разрывы</label>
+              <output id="noiseValue">0</output>
+            </div>
+            <input id="noise" type="range" min="0" max="100" value="0">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Экспорт</h2>
+          <div class="color-grid">
+            <label class="color-field">
+              <input id="inkColor" type="color" value="#b6ff63">
+              <span>Полосы</span>
+            </label>
+            <label class="color-field">
+              <input id="paperColor" type="color" value="#2b2529">
+              <span>Фон</span>
+            </label>
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <label for="targetSize">Размер</label>
+              <output id="targetSizeValue">1420 px</output>
+            </div>
+            <input id="targetSize" type="range" min="320" max="1800" step="20" value="1420">
+          </div>
+
+          <div class="button-row">
+            <button id="swapColors" type="button">Поменять цвета</button>
+            <button id="exportPngButton" type="button" disabled>Скачать PNG</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="stage" aria-label="Превью">
+        <div class="info">
+          <div class="status" id="statusText">Нет изображения</div>
+          <div id="statsText">0 rect</div>
+        </div>
+        <div class="preview">
+          <div class="placeholder" id="placeholder">Загрузить фото</div>
+          <canvas class="hidden" id="previewCanvas"></canvas>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const els = {
+      fileInput: document.querySelector("#fileInput"),
+      dropZone: document.querySelector("#dropZone"),
+      fileMeta: document.querySelector("#fileMeta"),
+      resetButton: document.querySelector("#resetButton"),
+      exportSvgButton: document.querySelector("#exportSvgButton"),
+      exportPngButton: document.querySelector("#exportPngButton"),
+      swapColors: document.querySelector("#swapColors"),
+      previewCanvas: document.querySelector("#previewCanvas"),
+      placeholder: document.querySelector("#placeholder"),
+      statusText: document.querySelector("#statusText"),
+      statsText: document.querySelector("#statsText"),
+      threshold: document.querySelector("#threshold"),
+      readability: document.querySelector("#readability"),
+      softness: document.querySelector("#softness"),
+      autoCrop: document.querySelector("#autoCrop"),
+      stripeHeight: document.querySelector("#stripeHeight"),
+      stripeGap: document.querySelector("#stripeGap"),
+      stripeAngle: document.querySelector("#stripeAngle"),
+      cellSize: document.querySelector("#cellSize"),
+      minRun: document.querySelector("#minRun"),
+      noise: document.querySelector("#noise"),
+      targetSize: document.querySelector("#targetSize"),
+      inkColor: document.querySelector("#inkColor"),
+      paperColor: document.querySelector("#paperColor")
+    };
+
+    const labels = {
+      threshold: document.querySelector("#thresholdValue"),
+      readability: document.querySelector("#readabilityValue"),
+      softness: document.querySelector("#softnessValue"),
+      stripeHeight: document.querySelector("#stripeHeightValue"),
+      stripeGap: document.querySelector("#stripeGapValue"),
+      stripeAngle: document.querySelector("#stripeAngleValue"),
+      cellSize: document.querySelector("#cellSizeValue"),
+      minRun: document.querySelector("#minRunValue"),
+      noise: document.querySelector("#noiseValue"),
+      targetSize: document.querySelector("#targetSizeValue")
+    };
+
+    const state = {
+      mode: "photo",
+      image: null,
+      imageName: "striped-silhouette",
+      bars: [],
+      outputWidth: 0,
+      outputHeight: 0,
+      renderId: 0
+    };
+
+    const sourceCanvas = document.createElement("canvas");
+    const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+    const previewCtx = els.previewCanvas.getContext("2d");
+
+    function number(id) {
+      return Number(els[id].value);
+    }
+
+    function settings() {
+      return {
+        mode: state.mode,
+        threshold: number("threshold") / 100,
+        readability: number("readability") / 100,
+        softness: number("softness"),
+        autoCrop: els.autoCrop.checked,
+        stripeHeight: number("stripeHeight"),
+        stripeGap: number("stripeGap"),
+        stripeAngle: number("stripeAngle"),
+        cellSize: number("cellSize"),
+        minRun: number("minRun"),
+        noise: number("noise") / 100,
+        targetSize: number("targetSize"),
+        inkColor: els.inkColor.value,
+        paperColor: els.paperColor.value
+      };
+    }
+
+    function updateLabels() {
+      labels.threshold.textContent = els.threshold.value;
+      labels.readability.textContent = els.readability.value;
+      labels.softness.textContent = els.softness.value;
+      labels.stripeHeight.textContent = `${els.stripeHeight.value} px`;
+      labels.stripeGap.textContent = `${els.stripeGap.value} px`;
+      labels.stripeAngle.textContent = `${els.stripeAngle.value}°`;
+      labels.cellSize.textContent = `${els.cellSize.value} px`;
+      labels.minRun.textContent = `${els.minRun.value} px`;
+      labels.noise.textContent = els.noise.value;
+      labels.targetSize.textContent = `${els.targetSize.value} px`;
+    }
+
+    function scheduleRender() {
+      if (!state.image) return;
+      const id = ++state.renderId;
+      requestAnimationFrame(() => {
+        if (id === state.renderId) render();
+      });
+    }
+
+    function loadFile(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        state.image = image;
+        state.imageName = file.name.replace(/\.[^.]+$/, "") || "striped-silhouette";
+        els.fileMeta.textContent = `${file.name} · ${image.naturalWidth} x ${image.naturalHeight}`;
+        els.statusText.textContent = file.name;
+        els.exportSvgButton.disabled = false;
+        els.exportPngButton.disabled = false;
+        applyDefaultPreset(false);
+        render();
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        els.fileMeta.textContent = "Не удалось открыть файл";
+      };
+
+      image.src = url;
+    }
+
+    function drawSource(image, size) {
+      const scale = size / Math.max(image.naturalWidth, image.naturalHeight);
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+      sourceCanvas.width = width;
+      sourceCanvas.height = height;
+      sourceCtx.clearRect(0, 0, width, height);
+      sourceCtx.imageSmoothingEnabled = true;
+      sourceCtx.imageSmoothingQuality = "high";
+      sourceCtx.drawImage(image, 0, 0, width, height);
+
+      return sourceCtx.getImageData(0, 0, width, height);
+    }
+
+    function buildMaps(imageData, s) {
+      const { width, height, data } = imageData;
+      const luminance = new Float32Array(width * height);
+      const score = new Float32Array(width * height);
+      const bg = estimateBackground(data, width, height);
+
+      for (let p = 0, i = 0; i < data.length; p += 1, i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3] / 255;
+        const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        luminance[p] = lum;
+
+        if (s.mode === "photo") {
+          score[p] = 1 - lum;
+        } else if (s.mode === "dark") {
+          score[p] = (1 - lum) * a;
+        } else {
+          const dr = r - bg[0];
+          const dg = g - bg[1];
+          const db = b - bg[2];
+          score[p] = Math.min(1, Math.sqrt(dr * dr + dg * dg + db * db) / 255) * a;
+        }
+      }
+
+      if (s.mode === "photo") {
+        normalizePhotoScore(score, luminance);
+        addEdges(score, luminance, width, height, s.readability);
+      } else {
+        addEdges(score, luminance, width, height, s.readability * .6);
+      }
+
+      return s.softness > 0
+        ? blur(score, width, height, Math.min(3, s.softness))
+        : score;
+    }
+
+    function normalizePhotoScore(score, luminance) {
+      const range = percentileRange(luminance);
+      for (let i = 0; i < score.length; i += 1) {
+        const normalized = clamp01((luminance[i] - range.low) / range.span);
+        score[i] = 1 - normalized;
+      }
+    }
+
+    function percentileRange(values) {
+      const bins = new Uint32Array(256);
+      for (let i = 0; i < values.length; i += 1) {
+        bins[Math.max(0, Math.min(255, Math.round(values[i] * 255)))] += 1;
+      }
+
+      const lowTarget = values.length * 0.04;
+      const highTarget = values.length * 0.96;
+      let low = 0;
+      let high = 255;
+      let total = 0;
+
+      for (let i = 0; i < 256; i += 1) {
+        total += bins[i];
+        if (total >= lowTarget) {
+          low = i;
+          break;
+        }
+      }
+
+      total = 0;
+      for (let i = 0; i < 256; i += 1) {
+        total += bins[i];
+        if (total >= highTarget) {
+          high = i;
+          break;
+        }
+      }
+
+      if (high <= low) high = low + 1;
+      return { low: low / 255, span: (high - low) / 255 };
+    }
+
+    function addEdges(score, luminance, width, height, amount) {
+      for (let y = 1; y < height - 1; y += 1) {
+        const row = y * width;
+        for (let x = 1; x < width - 1; x += 1) {
+          const p = row + x;
+          const gx = luminance[p + 1] - luminance[p - 1];
+          const gy = luminance[p + width] - luminance[p - width];
+          const edge = Math.min(1, Math.sqrt(gx * gx + gy * gy) * 7.5);
+          score[p] = clamp01(score[p] * (0.9 + amount * .22) + edge * (0.42 + amount * .55));
+        }
+      }
+    }
+
+    function estimateBackground(data, width, height) {
+      const step = Math.max(1, Math.floor(Math.max(width, height) / 160));
+      const r = [];
+      const g = [];
+      const b = [];
+
+      function push(x, y) {
+        const i = (y * width + x) * 4;
+        if (data[i + 3] < 10) return;
+        r.push(data[i]);
+        g.push(data[i + 1]);
+        b.push(data[i + 2]);
+      }
+
+      for (let x = 0; x < width; x += step) {
+        push(x, 0);
+        push(x, height - 1);
+      }
+      for (let y = 0; y < height; y += step) {
+        push(0, y);
+        push(width - 1, y);
+      }
+
+      if (!r.length) return [255, 255, 255];
+      r.sort((a, b) => a - b);
+      g.sort((a, b) => a - b);
+      b.sort((a, b) => a - b);
+      const m = Math.floor(r.length / 2);
+      return [r[m], g[m], b[m]];
+    }
+
+    function blur(input, width, height, radius) {
+      const temp = new Float32Array(input.length);
+      const output = new Float32Array(input.length);
+
+      for (let y = 0; y < height; y += 1) {
+        let sum = 0;
+        for (let x = -radius; x <= radius; x += 1) {
+          sum += input[y * width + Math.min(width - 1, Math.max(0, x))];
+        }
+        for (let x = 0; x < width; x += 1) {
+          temp[y * width + x] = sum / (radius * 2 + 1);
+          const removeX = Math.max(0, x - radius);
+          const addX = Math.min(width - 1, x + radius + 1);
+          sum += input[y * width + addX] - input[y * width + removeX];
+        }
+      }
+
+      for (let x = 0; x < width; x += 1) {
+        let sum = 0;
+        for (let y = -radius; y <= radius; y += 1) {
+          sum += temp[Math.min(height - 1, Math.max(0, y)) * width + x];
+        }
+        for (let y = 0; y < height; y += 1) {
+          output[y * width + x] = sum / (radius * 2 + 1);
+          const removeY = Math.max(0, y - radius);
+          const addY = Math.min(height - 1, y + radius + 1);
+          sum += temp[addY * width + x] - temp[removeY * width + x];
+        }
+      }
+
+      return output;
+    }
+
+    function findCrop(score, width, height, s) {
+      if (!s.autoCrop || s.mode === "photo") return { x: 0, y: 0, width, height };
+      let minX = width;
+      let minY = height;
+      let maxX = -1;
+      let maxY = -1;
+
+      for (let y = 0; y < height; y += 1) {
+        const row = y * width;
+        for (let x = 0; x < width; x += 1) {
+          if (score[row + x] >= s.threshold) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      if (maxX < minX || maxY < minY) return { x: 0, y: 0, width, height };
+      const pad = Math.round(Math.max(maxX - minX, maxY - minY) * .04);
+      minX = Math.max(0, minX - pad);
+      minY = Math.max(0, minY - pad);
+      maxX = Math.min(width - 1, maxX + pad);
+      maxY = Math.min(height - 1, maxY + pad);
+      return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+    }
+
+    function buildBars(score, imageWidth, imageHeight, crop, s) {
+      const bars = [];
+      const pitch = Math.max(1, s.stripeHeight + s.stripeGap);
+      const basis = stripeBasis(crop, s.stripeAngle);
+      const bounds = stripeBounds(crop.width, crop.height, basis);
+      const bridge = Math.max(1, Math.round(s.cellSize * (s.mode === "photo" ? 2.2 : 5)));
+      let row = 0;
+
+      for (let v = bounds.minV; v < bounds.maxV; v += pitch) {
+        const rowBars = [];
+        let runStart = null;
+        let runEnd = null;
+        let cell = 0;
+
+        for (let u = bounds.minU; u < bounds.maxU; u += s.cellSize) {
+          const value = sampleAngled(score, imageWidth, imageHeight, crop, basis, u, v, s.cellSize, s.stripeHeight);
+          const active = activeCell(value, cell, row, s);
+
+          if (active) {
+            if (runStart === null) runStart = u;
+            runEnd = u + s.cellSize;
+          } else if (runStart !== null) {
+            pushRun(rowBars, runStart, runEnd, v, s);
+            runStart = null;
+            runEnd = null;
+          }
+
+          cell += 1;
+        }
+
+        if (runStart !== null) pushRun(rowBars, runStart, runEnd, v, s);
+        bars.push(...mergeRuns(rowBars, bridge));
+        row += 1;
+      }
+
+      return bars;
+    }
+
+    function stripeBasis(crop, degrees) {
+      const angle = degrees * Math.PI / 180;
+      return {
+        cos: Math.cos(angle),
+        sin: Math.sin(angle),
+        cx: crop.width / 2,
+        cy: crop.height / 2
+      };
+    }
+
+    function stripeBounds(width, height, basis) {
+      const points = [
+        [-width / 2, -height / 2],
+        [width / 2, -height / 2],
+        [width / 2, height / 2],
+        [-width / 2, height / 2]
+      ];
+      let minU = Infinity;
+      let maxU = -Infinity;
+      let minV = Infinity;
+      let maxV = -Infinity;
+
+      for (const [x, y] of points) {
+        const u = x * basis.cos + y * basis.sin;
+        const v = -x * basis.sin + y * basis.cos;
+        minU = Math.min(minU, u);
+        maxU = Math.max(maxU, u);
+        minV = Math.min(minV, v);
+        maxV = Math.max(maxV, v);
+      }
+
+      return {
+        minU: Math.floor(minU) - 4,
+        maxU: Math.ceil(maxU) + 4,
+        minV: Math.floor(minV) - 4,
+        maxV: Math.ceil(maxV) + 4
+      };
+    }
+
+    function sampleAngled(score, imageWidth, imageHeight, crop, basis, u0, v0, width, height) {
+      const stepU = Math.max(1, Math.floor(width / 2));
+      const stepV = Math.max(1, Math.floor(height / 2));
+      let total = 0;
+      let count = 0;
+
+      for (let v = v0 + stepV / 2; v < v0 + height; v += stepV) {
+        for (let u = u0 + stepU / 2; u < u0 + width; u += stepU) {
+          const localX = basis.cx + u * basis.cos - v * basis.sin;
+          const localY = basis.cy + u * basis.sin + v * basis.cos;
+          if (localX < 0 || localY < 0 || localX >= crop.width || localY >= crop.height) continue;
+          const x = Math.max(0, Math.min(imageWidth - 1, Math.round(crop.x + localX)));
+          const y = Math.max(0, Math.min(imageHeight - 1, Math.round(crop.y + localY)));
+          total += score[y * imageWidth + x];
+          count += 1;
+        }
+      }
+
+      return count ? total / count : 0;
+    }
+
+    function activeCell(value, cell, row, s) {
+      if (s.mode === "photo") {
+        const density = clamp01(value * (0.92 + s.readability * .28));
+        const dither = orderedDither(cell, row);
+        return density >= dither * (0.96 - s.readability * .18) + s.threshold * .18;
+      }
+
+      const noise = (seededNoise(cell, row) - .5) * s.noise * .36;
+      return value + noise >= s.threshold;
+    }
+
+    function orderedDither(x, y) {
+      const m = [
+        0, 8, 2, 10,
+        12, 4, 14, 6,
+        3, 11, 1, 9,
+        15, 7, 13, 5
+      ];
+      return (m[(y & 3) * 4 + (x & 3)] + .5) / 16;
+    }
+
+    function seededNoise(x, y) {
+      let n = Math.imul(x + 101, 374761393) ^ Math.imul(y + 251, 668265263);
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+    }
+
+    function pushRun(rowBars, start, end, y, s) {
+      const width = end - start;
+      if (width < s.minRun) return;
+      rowBars.push({ x: start, y, width, height: s.stripeHeight });
+    }
+
+    function mergeRuns(rowBars, gap) {
+      if (!rowBars.length) return [];
+      const out = [];
+      let current = { ...rowBars[0] };
+
+      for (let i = 1; i < rowBars.length; i += 1) {
+        const next = rowBars[i];
+        if (next.x - (current.x + current.width) <= gap) {
+          current.width = next.x + next.width - current.x;
+        } else {
+          out.push(current);
+          current = { ...next };
+        }
+      }
+
+      out.push(current);
+      return out;
+    }
+
+    function render() {
+      const s = settings();
+      const imageData = drawSource(state.image, s.targetSize);
+      const score = buildMaps(imageData, s);
+      const crop = findCrop(score, imageData.width, imageData.height, s);
+      const bars = buildBars(score, imageData.width, imageData.height, crop, s);
+
+      state.bars = bars;
+      state.outputWidth = crop.width;
+      state.outputHeight = crop.height;
+
+      drawPreview(bars, crop.width, crop.height, s);
+      els.statsText.textContent = `${bars.length} rect · ${crop.width} x ${crop.height}`;
+      els.statusText.textContent = state.imageName;
+    }
+
+    function drawPreview(bars, width, height, s) {
+      els.previewCanvas.width = width;
+      els.previewCanvas.height = height;
+      previewCtx.clearRect(0, 0, width, height);
+      previewCtx.fillStyle = s.paperColor;
+      previewCtx.fillRect(0, 0, width, height);
+      previewCtx.save();
+      previewCtx.translate(width / 2, height / 2);
+      previewCtx.rotate(s.stripeAngle * Math.PI / 180);
+      previewCtx.fillStyle = s.inkColor;
+
+      for (const bar of bars) {
+        roundedRect(previewCtx, bar.x, bar.y, bar.width, bar.height, radius(bar));
+        previewCtx.fill();
+      }
+
+      previewCtx.restore();
+      els.placeholder.classList.add("hidden");
+      els.previewCanvas.classList.remove("hidden");
+    }
+
+    function roundedRect(ctx, x, y, width, height, r) {
+      const radius = Math.min(r, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function radius(bar) {
+      return Math.min(bar.height / 2, bar.width / 2);
+    }
+
+    function svgMarkup() {
+      const s = settings();
+      const width = state.outputWidth;
+      const height = state.outputHeight;
+      const transform = `translate(${fmt(width / 2)} ${fmt(height / 2)}) rotate(${fmt(s.stripeAngle)})`;
+      const rects = state.bars.map((bar) => {
+        const r = radius(bar);
+        return `<rect x="${fmt(bar.x)}" y="${fmt(bar.y)}" width="${fmt(bar.width)}" height="${fmt(bar.height)}" rx="${fmt(r)}" ry="${fmt(r)}"/>`;
+      }).join("");
+
+      return [
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" shape-rendering="geometricPrecision">`,
+        `<defs><clipPath id="frame"><rect width="${width}" height="${height}"/></clipPath></defs>`,
+        `<rect width="${width}" height="${height}" fill="${s.paperColor}"/>`,
+        `<g clip-path="url(#frame)"><g fill="${s.inkColor}" transform="${transform}">${rects}</g></g>`,
+        `</svg>`
+      ].join("\n");
+    }
+
+    function fmt(value) {
+      return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    function downloadBlob(content, type, extension) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${state.imageName || "striped-silhouette"}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+    function exportPng() {
+      els.previewCanvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${state.imageName || "striped-silhouette"}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+      }, "image/png");
+    }
+
+    function applyDefaultPreset(shouldRender = true) {
+      state.mode = "photo";
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === state.mode);
+      });
+      els.threshold.value = 8;
+      els.readability.value = 100;
+      els.softness.value = 6;
+      els.autoCrop.checked = false;
+      els.stripeHeight.value = 11;
+      els.stripeGap.value = 6;
+      els.stripeAngle.value = -43;
+      els.cellSize.value = 11;
+      els.minRun.value = 13;
+      els.noise.value = 0;
+      els.targetSize.value = 1420;
+      els.inkColor.value = "#b6ff63";
+      els.paperColor.value = "#2b2529";
+      updateLabels();
+      if (shouldRender) scheduleRender();
+    }
+
+    function resetControls() {
+      applyDefaultPreset(true);
+    }
+
+    els.fileInput.addEventListener("change", () => loadFile(els.fileInput.files[0]));
+
+    els.dropZone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      els.dropZone.classList.add("drag");
+    });
+
+    els.dropZone.addEventListener("dragleave", () => {
+      els.dropZone.classList.remove("drag");
+    });
+
+    els.dropZone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      els.dropZone.classList.remove("drag");
+      loadFile(event.dataTransfer.files[0]);
+    });
+
+    document.querySelectorAll("[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.mode = button.dataset.mode;
+        document.querySelectorAll("[data-mode]").forEach((item) => {
+          item.classList.toggle("active", item === button);
+        });
+        scheduleRender();
+      });
+    });
+
+    [
+      "threshold",
+      "readability",
+      "softness",
+      "autoCrop",
+      "stripeHeight",
+      "stripeGap",
+      "stripeAngle",
+      "cellSize",
+      "minRun",
+      "noise",
+      "targetSize",
+      "inkColor",
+      "paperColor"
+    ].forEach((id) => {
+      els[id].addEventListener("input", () => {
+        updateLabels();
+        scheduleRender();
+      });
+    });
+
+    els.resetButton.addEventListener("click", resetControls);
+    els.swapColors.addEventListener("click", () => {
+      const ink = els.inkColor.value;
+      els.inkColor.value = els.paperColor.value;
+      els.paperColor.value = ink;
+      scheduleRender();
+    });
+
+    els.exportSvgButton.addEventListener("click", () => {
+      if (state.bars.length) downloadBlob(svgMarkup(), "image/svg+xml;charset=utf-8", "svg");
+    });
+
+    els.exportPngButton.addEventListener("click", () => {
+      if (state.bars.length) exportPng();
+    });
+
+    function clamp01(value) {
+      return Math.max(0, Math.min(1, value));
+    }
+
+    updateLabels();
+  </script>
+</body>
+</html>
